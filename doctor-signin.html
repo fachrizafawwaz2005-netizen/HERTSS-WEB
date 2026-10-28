@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doctor Sign In — HERTS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/signin.css">
+  <link rel="stylesheet" href="assets/mobile-responsive.css">
+</head>
+<body>
+<div class="split">
+
+  <section class="intro" aria-label="About HERTS">
+    <div class="intro-inner">
+      <a class="brand" href="index.html" aria-label="HERTS Cardiac Monitor — back to Home">
+        <img src="assets/herts-logo.png" width="132" height="78" alt="">
+        <div><b>HERTS</b><span>CARDIAC MONITOR</span></div>
+      </a>
+      <div class="intro-info">
+        <p class="sys">High-speed Electrical Reconstruction Tomography System</p>
+        <h2>Continuous Cardiac Monitoring</h2>
+        <p class="lede">Monitor heart activity and rhythm in real time through heart visualization.</p>
+        <ul class="points">
+          <li>Real-time heart visualization using EIT</li>
+          <li>16-electrode cardiac sensing system</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <main class="form-panel">
+    <div class="form-inner">
+      <h1>Access patient monitoring</h1>
+      <p class="form-sub">Sign in to connect patient HERTS device and access monitoring history.</p>
+
+      <form id="doctor-signin-form" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email"
+                 placeholder="you@example.com" required aria-describedby="email-err">
+          <p class="err" id="email-err" aria-live="polite"></p>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password"
+                 autocomplete="current-password" placeholder="••••••••"
+                 required aria-describedby="password-err">
+          <p class="err" id="password-err" aria-live="polite"></p>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="signin-button" type="submit">Sign In</button>
+          <a class="btn btn-secondary" href="doctor-register.html">Create Account</a>
+        </div>
+
+        <p class="status" id="signin-status" role="status" aria-live="polite" hidden></p>
+      </form>
+
+      <p class="note">Your monitoring history stays linked to your account.</p>
+      <p class="switch">Not a doctor? <a href="patient-signin.html">Patient sign in</a> · <a href="login.html">Change role</a></p>
+    </div>
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  var form = document.getElementById("doctor-signin-form");
+  var emailInput = document.getElementById("email");
+  var passwordInput = document.getElementById("password");
+  var button = document.getElementById("signin-button");
+  var statusBox = document.getElementById("signin-status");
+  var emailError = document.getElementById("email-err");
+  var passwordError = document.getElementById("password-err");
+
+  function showStatus(message, isError) {
+    statusBox.hidden = false;
+    statusBox.textContent = message;
+    statusBox.style.color = isError ? "#b42318" : "";
+  }
+
+  function clearErrors() {
+    emailError.textContent = "";
+    passwordError.textContent = "";
+    statusBox.hidden = true;
+    statusBox.textContent = "";
+  }
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    clearErrors();
+
+    var email = emailInput.value.trim();
+    var password = passwordInput.value;
+
+    if (!email) {
+      emailError.textContent = "Please enter your email.";
+      emailInput.focus();
+      return;
+    }
+
+    if (!password) {
+      passwordError.textContent = "Please enter your password.";
+      passwordInput.focus();
+      return;
+    }
+
+    var supabaseClient = window.HERTS_SUPABASE;
+
+    if (!supabaseClient) {
+      showStatus(
+        "Supabase could not be initialized. Check the Supabase configuration files.",
+        true
+      );
+      console.error("HERTS: Supabase client is unavailable.");
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Signing in...";
+
+    try {
+      var result = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      if (!result.data.session) {
+        throw new Error("Sign-in succeeded without an active session.");
+      }
+
+      showStatus("Sign-in successful. Opening doctor dashboard...", false);
+
+      window.location.href = "doctor-overview.html";
+
+    } catch (error) {
+      console.error("HERTS doctor sign-in failed:", error);
+
+      var message = error.message || "Unable to sign in.";
+
+      if (
+        message.toLowerCase().includes("invalid login credentials")
+      ) {
+        message = "Email or password is incorrect.";
+      } else if (
+        message.toLowerCase().includes("email not confirmed")
+      ) {
+        message = "Please confirm your email before signing in.";
+      }
+
+      showStatus(message, true);
+
+    } finally {
+      button.disabled = false;
+      button.textContent = "Sign In";
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+._*
+
+# --- Editor / IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Secrets & environment (Supabase tahap berikutnya) ---
+# Jangan pernah commit service_role key, password database, atau token pribadi.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Dependencies & build (belum dipakai; disiapkan untuk tooling di masa depan) ---
+node_modules/
+dist/
+build/
+.cache/
+.supabase/
+
+# --- Log & berkas sementara ---
+*.log
+npm-debug.log*
+*.tmp
+*.bak

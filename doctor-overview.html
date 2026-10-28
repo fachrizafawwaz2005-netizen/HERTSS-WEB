@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doctor Overview — HERTS Doctor Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/patient-portal.css">
+<link rel="stylesheet" href="assets/doctor-portal.css">
+  <link rel="stylesheet" href="assets/mobile-responsive.css">
+</head>
+<body>
+<main class="page dr">
+  <div class="dp">
+    <h1>Doctor Overview</h1>
+    <p class="lede" id="today">Loading dashboard...</p>
+    <div class="stats" id="stats"></div>
+
+    <div class="dgrid">
+      <div class="dcol">
+        <section class="dcard" aria-labelledby="a-t" id="active-card">
+          <div class="head">
+            <div>
+              <h2 id="a-t">Active Session</h2>
+              <p class="sub">Measurement session currently in progress.</p>
+            </div>
+            <span class="bdg active">Active</span>
+          </div>
+          <dl class="active-box" id="active-box"></dl>
+          <div class="actions" id="active-actions"></div>
+        </section>
+
+        <section class="dcard" aria-labelledby="r-t">
+          <h2 id="r-t">Recent Measurement Sessions</h2>
+          <p class="sub">Latest recorded sessions across your assigned patients.</p>
+          <div class="tw">
+            <table class="dt">
+              <thead>
+                <tr>
+                  <th>Date &amp; Time</th>
+                  <th>Patient</th>
+                  <th>Session ID</th>
+                  <th>Duration</th>
+                  <th>Recording</th>
+                  <th>Status</th>
+                  <th><span style="position:absolute;left:-9999px">Action</span></th>
+                </tr>
+              </thead>
+              <tbody id="recent"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <div class="dcol">
+        <section class="dcard" aria-labelledby="q-t">
+          <h2 id="q-t">Quick Access</h2>
+          <p class="sub">Jump to your patients.</p>
+          <a class="qa" href="doctor-patients.html">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#17212F" stroke-width="1.6" aria-hidden="true">
+              <circle cx="10" cy="7" r="3.5"/>
+              <path d="M3.5 20v-1.5a5 5 0 0 1 5-5h3M17 14v6M14 17h6"/>
+            </svg>
+            <span><b>Patients</b><span id="qa-n"></span></span>
+            <em>Open ▶</em>
+          </a>
+        </section>
+
+        <section class="dcard" aria-labelledby="ap-t">
+          <div class="head">
+            <h2 id="ap-t">Assigned Patients</h2>
+            <a class="vall" href="doctor-patients.html">View all ▶</a>
+          </div>
+          <p class="sub">Latest session per patient.</p>
+          <ul class="ap" id="ap"></ul>
+        </section>
+      </div>
+    </div>
+
+    <section class="dcard about-d" aria-labelledby="ab-t">
+      <img src="assets/icon-info.png" alt="">
+      <div>
+        <b id="ab-t">About This Overview</b>
+        <p>This page summarizes monitoring records saved in HERTS. Visualizations and waveforms represent recorded electrical measurements and should not be interpreted as a diagnosis on their own.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="assets/doctor.js"></script>
+<script>HD.shell("overview");</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/doctor-data.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (selector) {
+    return document.querySelector(selector);
+  };
+
+  function esc(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[ch];
+    });
+  }
+
+  function formatDate(value) {
+    if (!value) return "—";
+    return new Date(value).toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+  function formatDuration(start, end) {
+    if (!start) return "—";
+    var startTime = new Date(start).getTime();
+    var endTime = end ? new Date(end).getTime() : Date.now();
+    var minutes = Math.max(0, Math.floor((endTime - startTime) / 60000));
+    return minutes + " min";
+  }
+
+  function statusBadge(status) {
+    var safeStatus = esc(status || "unknown");
+    var cssClass = status === "in_progress" || status === "active"
+      ? "active"
+      : status === "completed"
+        ? "completed"
+        : "dash";
+
+    return '<span class="bdg ' + cssClass + '">' +
+      safeStatus.replace(/_/g, " ") +
+      "</span>";
+  }
+
+  function showError(message) {
+    $("#today").textContent = message;
+    $("#stats").innerHTML = "";
+    $("#active-box").innerHTML =
+      '<div><dt>Status</dt><dd>Data could not be loaded</dd></div>';
+    $("#recent").innerHTML =
+      '<tr><td colspan="7">' + esc(message) + "</td></tr>";
+    $("#ap").innerHTML = "";
+    $("#qa-n").textContent = "";
+  }
+
+  async function loadDashboard() {
+    var supabaseClient = window.HERTS_SUPABASE;
+
+    if (!supabaseClient) {
+      showError(
+        "Supabase client belum tersedia. Periksa supabase-config.js dan supabase-client.js."
+      );
+      console.error("HERTS: window.HERTS_SUPABASE tidak ditemukan.");
+      return;
+    }
+
+    try {
+      var doctorContext = await window.HERTSDoctorData.doctor();
+      var patients = await window.HERTSDoctorData.patients(supabaseClient, doctorContext.user.id);
+      var sessions = await window.HERTSDoctorData.sessionsFor(
+        supabaseClient, patients.map(function (patient) { return patient.id; })
+      );
+
+      var patientById = {};
+      patients.forEach(function (patient) {
+        patientById[patient.id] = patient;
+      });
+
+      var todayDate = new Date().toLocaleDateString("en-CA");
+      var todaySessions = sessions.filter(function (session) {
+        return session.started_at &&
+          new Date(session.started_at).toLocaleDateString("en-CA") === todayDate;
+      });
+
+      var activeSessions = sessions.filter(function (session) {
+        return session.status === "in_progress" ||
+          session.status === "active";
+      });
+
+      var recentSessions = sessions.slice(0, 6);
+
+      $("#today").textContent =
+        new Date().toLocaleDateString("en-GB", {
+          weekday: "long",
+          day: "2-digit",
+          month: "long",
+          year: "numeric"
+        }) + " · Summary of patients and measurement sessions.";
+
+      function stat(label, number, description) {
+        return '<div><p>' + esc(label) + '</p>' +
+          '<p class="n">' + esc(number) + '</p>' +
+          '<p class="s">' + esc(description) + "</p></div>";
+      }
+
+      $("#stats").innerHTML =
+        stat("Patients", patients.length, "Patients in database") +
+        stat("Active Sessions", activeSessions.length, "Currently in progress") +
+        stat("Sessions Today", todaySessions.length, "Started today") +
+        stat("Recent Sessions", recentSessions.length, "Latest recorded sessions");
+
+      $("#qa-n").textContent = patients.length + " patients";
+
+      if (activeSessions.length) {
+        var active = activeSessions[0];
+        var activePatient = patientById[active.patient_id];
+        var activePatientName = activePatient
+          ? activePatient.full_name
+          : "Unknown patient";
+        var activePatientCode = activePatient
+          ? activePatient.patient_code
+          : "—";
+
+        $("#active-box").innerHTML =
+          "<div><dt>Patient</dt><dd>" + esc(activePatientName) + "</dd></div>" +
+          "<div><dt>Patient ID</dt><dd>" + esc(activePatientCode) + "</dd></div>" +
+          "<div><dt>Session ID</dt><dd>" + esc(active.session_code) + "</dd></div>" +
+          "<div><dt>Started · Duration</dt><dd>" +
+          esc(formatDate(active.started_at)) + " · " +
+          esc(active.duration_minutes != null
+            ? active.duration_minutes + " min"
+            : formatDuration(active.started_at)) +
+          "</dd></div>";
+
+        $("#active-actions").innerHTML =
+          '<a class="btn sm" href="doctor-session-detail.html?session=' +
+          encodeURIComponent(active.id) + '">View Session</a>';
+      } else {
+        $("#active-box").innerHTML =
+          '<div><dt>Status</dt><dd>No active session</dd></div>';
+        $("#active-actions").innerHTML = "";
+      }
+
+      $("#recent").innerHTML = recentSessions.map(function (session) {
+        var patient = patientById[session.patient_id];
+        var patientName = patient ? patient.full_name : "Unknown patient";
+        var patientCode = patient ? patient.patient_code : "—";
+        var isActive = session.status === "in_progress" ||
+          session.status === "active";
+
+        return "<tr>" +
+          "<td>" + esc(formatDate(session.started_at)) + "</td>" +
+          '<td class="pn">' + esc(patientName) +
+          "<br><small>" + esc(patientCode) + "</small></td>" +
+          '<td class="sid">' + esc(session.session_code) + "</td>" +
+          "<td>" + esc(session.duration_minutes != null
+            ? session.duration_minutes + " min"
+            : formatDuration(session.started_at)) + "</td>" +
+          "<td>" + (session.recording_available ? "Available" :
+            isActive ? "In progress" : "Not available") + "</td>" +
+          "<td>" + statusBadge(session.status) + "</td>" +
+          '<td><a class="lnk" href="doctor-session-detail.html?session=' +
+          encodeURIComponent(session.id) + '">View Session ▶</a></td>' +
+          "</tr>";
+      }).join("") || '<tr><td colspan="7">No sessions found.</td></tr>';
+
+      var latestSessionByPatient = {};
+      sessions.forEach(function (session) {
+        if (!latestSessionByPatient[session.patient_id]) {
+          latestSessionByPatient[session.patient_id] = session;
+        }
+      });
+
+      $("#ap").innerHTML = patients.map(function (patient) {
+        var latest = latestSessionByPatient[patient.id];
+
+        return "<li><div>" +
+          '<a href="doctor-patient-detail.html?patient=' +
+          encodeURIComponent(patient.id) + '">' +
+          esc(patient.full_name) + "</a>" +
+          "<small>" + esc(patient.patient_code) + " · " +
+          (latest
+            ? esc(latest.session_code + " · " + formatDate(latest.started_at))
+            : "No recent session") +
+          "</small></div>" +
+          (latest
+            ? statusBadge(latest.status)
+            : '<span class="bdg dash">—</span>') +
+          "</li>";
+      }).join("") || "<li>No patients found.</li>";
+
+      console.log("HERTS: Dashboard loaded from Supabase.", {
+        patients: patients.length,
+        sessions: sessions.length
+      });
+
+    } catch (error) {
+      console.error("HERTS: Failed to load dashboard data:", error);
+      showError(
+        "Gagal mengambil data Supabase: " +
+        (error.message || "Unknown error") +
+        ". Periksa login dan kebijakan akses database."
+      );
+    }
+  }
+
+  loadDashboard();
+})();
+</script>
+</body>
+</html>

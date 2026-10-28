@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Information &amp; Guide — HERTS</title>
+<meta name="description" content="Learn what HERTS is, how the monitoring system works, and what you need to know before starting a monitoring session.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#2F5EA7;       /* primary blue */
+  --ink:#17212F;         /* body text and headings: instrument navy */
+  --bg:#F7F8F8;
+  --white:#FFFFFF;
+  --navy:#17212F;
+  --gray:#E3ECF5;        /* secondary button */
+  --neutral:#FFFFFF;     /* card surface */
+  --slate:#385768;
+  --line:#A9B8C6;        /* dividers */
+  --card-line:#DAE1E8;
+  --header-bg:linear-gradient(100deg,#17212F 0%,#1E3A66 38%,#2F5EA7 74%,#3977B4 100%);   /* navy → blue */
+
+  --fs-body:clamp(1rem,.95rem + .25vw,1.0625rem);   /* 16–17px */
+  --fs-small:.9375rem;
+  --fs-h1:clamp(2.25rem,1.6rem + 2.8vw,3.25rem);
+  --fs-h2:clamp(1.875rem,1.55rem + 1.2vw,2.25rem);  /* 30–36px */
+  --fs-h3:1.0625rem;
+  --maxw:1200px;
+  --gutter:clamp(1.25rem,4vw,3rem);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:var(--fs-body);line-height:1.65}
+h1,h2,h3,p,ul,ol{margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--navy);outline-offset:3px;border-radius:6px}
+.skip{position:absolute;left:-999px;top:0;background:var(--white);color:var(--brand);padding:.5rem 1rem;z-index:30}
+.skip:focus{left:1rem;top:1rem}
+
+/* ---------- Navigation ---------- */
+.site-header{background:var(--header-bg);color:var(--white);position:sticky;top:0;z-index:20;border-bottom:1px solid rgba(255,255,255,.1);box-shadow:0 2px 14px rgba(23,33,47,.38)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:68px;padding-inline:var(--gutter);max-width:1440px;margin-inline:auto}
+.brand{display:flex;align-items:center;gap:.75rem;text-decoration:none;color:var(--white)}
+.brand img{height:44px;width:auto;filter:drop-shadow(0 0 8px rgba(107,187,206,.5))}
+.brand b{display:block;font-size:1.25rem;line-height:1.1;font-weight:700;letter-spacing:.02em}
+.brand span{display:block;font-size:var(--fs-small);line-height:1.2}
+.nav{display:flex;align-items:center;gap:.5rem}
+.nav a{color:var(--white);text-decoration:none;font-weight:600;font-size:1.0625rem;padding:.5rem 1.25rem;border-radius:999px;min-height:44px;display:inline-flex;align-items:center;transition:background .15s}
+.nav a:hover{background:rgba(255,255,255,.2)}
+.nav a[aria-current="page"]{background:var(--white);color:var(--brand);font-weight:700}
+.nav a:focus-visible{outline-color:var(--white)}
+.menu-btn{display:none;background:transparent;border:2px solid var(--white);border-radius:8px;width:48px;height:44px;cursor:pointer;padding:0;position:relative}
+.menu-btn span,.menu-btn span::before,.menu-btn span::after{display:block;width:22px;height:2px;background:var(--white);content:"";position:absolute;left:50%;margin-left:-11px}
+.menu-btn span{top:50%;margin-top:-1px}.menu-btn span::before{top:-7px;margin-left:0;left:0}.menu-btn span::after{top:7px;margin-left:0;left:0}
+.menu-btn:focus-visible{outline-color:var(--white)}
+
+/* ---------- Layout ---------- */
+.page{max-width:var(--maxw);margin-inline:auto;padding:clamp(2rem,5vw,3.5rem) var(--gutter) clamp(2.5rem,6vw,4rem);display:grid;grid-template-columns:minmax(0,1fr) 380px;grid-template-areas:"head side" "main side";column-gap:clamp(2rem,6vw,5rem);align-items:start}
+.head{grid-area:head}
+.main{grid-area:main}
+.side{grid-area:side;position:sticky;top:92px;display:grid;gap:1.5rem}
+.head p.lead,.main p,.main li{max-width:40rem}
+
+h1{font-size:var(--fs-h1);line-height:1.15;font-weight:700;color:var(--ink);letter-spacing:-.01em;display:inline-block;border-bottom:3px solid var(--brand);padding-bottom:.35rem;margin-bottom:1.5rem}
+h2{font-size:var(--fs-h2);line-height:1.2;font-weight:700;color:var(--ink);letter-spacing:-.01em;display:inline-block;border-bottom:3px solid var(--brand);padding-bottom:.3rem;margin-bottom:1.25rem}
+section{margin-top:clamp(2rem,4.5vw,3rem);scroll-margin-top:92px}
+section>p+p{margin-top:1.1rem}
+h3{font-size:var(--fs-h3);line-height:1.4;font-weight:700;color:var(--ink)}
+
+.steps{list-style:none;padding:0;counter-reset:s;display:grid;gap:1.4rem;margin-top:1.4rem}
+.steps li{counter-increment:s}
+.steps h3::before{content:counter(s) ". "}
+.blocks{display:grid;gap:1.4rem}
+.bullets{margin-top:.75rem;padding-left:1.4rem;display:grid;gap:.6rem}
+.bullets li::marker{color:var(--brand)}
+.bullets strong{display:block;font-weight:700}
+.notes{padding-left:1.4rem;display:grid;gap:.6rem}
+
+/* ---------- Sidebar ---------- */
+.btns{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:flex-end}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:.6rem 1.4rem;border-radius:8px;border:0;font:600 1rem/1.2 'IBM Plex Sans',system-ui,sans-serif;text-decoration:none;cursor:pointer;box-shadow:0 1px 2px rgba(23,33,47,.22);transition:background .15s,transform .1s}
+.btn-primary{background:var(--brand);background-image:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0) 62%);color:var(--white)}
+.btn-primary:hover{background:#234A86;background-image:none}
+.btn-secondary{background:var(--gray);color:var(--ink)}
+.btn-secondary:hover{background:#D2DFEC}
+.btn:active{transform:translateY(1px)}
+.card{background:var(--neutral);border:1px solid var(--card-line);border-radius:14px;padding:1.5rem 1.5rem 1.75rem;box-shadow:0 1px 2px rgba(23,33,47,.06), 0 10px 24px -12px rgba(23,33,47,.28)}
+.card h2{font-size:1.25rem;color:var(--navy);border:0;padding:0;margin:0 0 .75rem;display:block}
+.qi{margin:0 0 1.5rem}
+.qi div{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:.9rem 0;border-bottom:1px solid var(--card-line)}
+.qi dt{font-size:var(--fs-small);color:var(--slate);font-weight:500}
+.qi dd{margin:0;font-weight:700;color:var(--navy);text-align:right}
+.card .btn{width:100%;min-height:48px}
+
+/* ---------- Footer ---------- */
+.site-footer{border-top:1px solid var(--line);padding:2.5rem var(--gutter) 3rem;font-size:var(--fs-small)}
+.foot{max-width:var(--maxw);margin-inline:auto;display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:2rem}
+.foot-brand{display:grid;gap:.75rem;align-content:start}
+.foot-logo{display:flex;align-items:center;gap:.75rem}
+.foot-logo img{height:52px;width:auto}
+.foot-logo b{display:block;font-size:1.125rem;line-height:1.1}
+.foot-logo span{font-size:1rem}
+.foot h3{font-size:1rem;margin-bottom:.5rem}
+.foot ul{list-style:none;margin:0;padding:0;display:grid;gap:.25rem}
+.foot a{text-decoration:none;display:inline-block;padding:.2rem 0}
+.foot a:hover{color:var(--brand);text-decoration:underline}
+.foot .mail{font-weight:600;overflow-wrap:anywhere}
+
+/* ---------- Responsive ---------- */
+@media (max-width:960px){
+  .page{grid-template-columns:1fr;grid-template-areas:"head" "side" "main"}
+  .side{position:static;margin-top:2rem}
+  .btns{justify-content:flex-start}
+  .head p.lead,.main p,.main li{max-width:none}
+  .foot{grid-template-columns:1fr 1fr}.foot-brand{grid-column:1/-1}
+}
+@media (max-width:760px){
+  .menu-btn{display:block}
+  .nav{display:none;position:absolute;left:0;right:0;top:100%;background:#17212F;flex-direction:column;align-items:stretch;padding:.5rem var(--gutter) 1rem;gap:.25rem;box-shadow:0 6px 8px rgba(0,0,0,.25)}
+  .nav.open{display:flex}
+  .nav a{border-radius:8px;justify-content:flex-start}
+}
+@media (max-width:560px){
+  .btns .btn{flex:1 1 100%}
+  .brand span{display:none}
+  .foot{grid-template-columns:1fr}
+  .qi div{flex-wrap:wrap}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn,.nav a{transition:none}}
+</style>
+  <link rel="stylesheet" href="assets/mobile-responsive.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="index.html" aria-label="HERTS Thoracic Monitoring System — Home">
+      <img src="assets/herts-logo-white.png" alt="" width="132" height="78">
+      <div><b>HERTS</b><span>Thoracic Monitoring System</span></div>
+    </a>
+    <button class="menu-btn" aria-expanded="false" aria-controls="nav" aria-label="Toggle menu"><span></span></button>
+    <!-- PLACEHOLDER LINKS: index.html and login.html are separate pages to be integrated later.
+         "Guide" scrolls to the guide section of this page. -->
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="information.html" aria-current="page">Information</a>
+      <a href="#how-it-works">Guide</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page" id="content">
+
+  <div class="head">
+    <h1>Information &amp; Guide</h1>
+    <p class="lead">Learn what HERTS is, how the monitoring system works, and what you need to know before starting a monitoring session.</p>
+  </div>
+
+  <aside class="side" aria-label="Quick information">
+    <div class="btns">
+      <!-- PLACEHOLDER: replace login.html with the login / role-selection page -->
+      <a class="btn btn-primary" href="login.html">Get Started</a>
+      <a class="btn btn-secondary" href="#how-it-works">Learn How It Works</a>
+    </div>
+    <div class="card">
+      <h2>Quick Information</h2>
+      <dl class="qi">
+        <div><dt>Monitoring Area</dt><dd>Thoracic &amp; Cardiac</dd></div>
+        <div><dt>Core Technology</dt><dd>EIT &amp; ECG</dd></div>
+        <div><dt>Electrodes</dt><dd>16 Electrodes</dd></div>
+        <div><dt>System Type</dt><dd>Wearable Monitoring</dd></div>
+      </dl>
+      <a class="btn btn-primary" href="login.html">Login</a>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <section id="about" aria-labelledby="about-t">
+      <h2 id="about-t">About HERTS</h2>
+      <p>HERTS is a wearable thoracic monitoring system designed to provide real-time information about changes in the chest through Electrical Impedance Tomography (EIT).</p>
+      <p>The system uses a wearable vest with electrodes placed around the chest. Electrical measurements collected from the body are processed to generate a visual representation of the thoracic region. HERTS also integrates ECG monitoring to provide additional information about cardiac activity.</p>
+      <p>HERTS is designed to make thoracic monitoring more practical and easier to understand through a connected web-based platform.</p>
+    </section>
+
+    <section id="how-it-works" aria-labelledby="how-t">
+      <h2 id="how-t">How HERTS Works</h2>
+      <p>HERTS combines wearable hardware, data acquisition, signal processing, and web-based visualization in one monitoring system.</p>
+      <ol class="steps">
+        <li><h3>Wear the HERTS Vest</h3><p>Put on the HERTS vest and make sure the electrodes are properly positioned around the chest.</p></li>
+        <li><h3>Connect the Device</h3><p>Connect the HERTS device and make sure the system shows that the device is ready for monitoring.</p></li>
+        <li><h3>Start Monitoring</h3><p>Start a monitoring session through the HERTS platform. The system collects thoracic measurements and ECG data during the session.</p></li>
+        <li><h3>View the Monitoring</h3><p>The collected data is processed and displayed through the HERTS platform, allowing users to view thoracic activity and ECG information in real time.</p></li>
+        <li><h3>Review Your Session</h3><p>After monitoring is completed, the session is saved so users can review the monitoring history and session details.</p></li>
+      </ol>
+    </section>
+
+    <section id="what-you-can-see" aria-labelledby="see-t">
+      <h2 id="see-t">What You Can See</h2>
+      <p>During a monitoring session, HERTS provides several types of information:</p>
+      <ul class="bullets">
+        <li><strong>Thoracic Visualization</strong>View changes in the thoracic region through EIT.</li>
+        <li><strong>Heart Activity</strong>View cardiac electrical activity through ECG.</li>
+        <li><strong>Device Status</strong>Check whether the device and connection are ready for monitoring.</li>
+        <li><strong>Monitoring History</strong>Review previous monitoring sessions and their recorded information.</li>
+      </ul>
+    </section>
+
+    <section id="who" aria-labelledby="who-t">
+      <h2 id="who-t">Who Can Use HERTS?</h2>
+      <div class="blocks">
+        <div><h3>Patients</h3><p>Use HERTS to participate in a monitoring session and review your previous monitoring information through the platform.</p></div>
+        <div><h3>Doctors &amp; Healthcare Professionals</h3><p>Access patient monitoring information and review thoracic and cardiac data through the doctor interface.</p></div>
+        <div><h3>Hospitals &amp; Clinics</h3><p>Use the HERTS platform as part of a connected environment for wearable thoracic monitoring.</p></div>
+      </div>
+    </section>
+
+    <section id="important" aria-labelledby="imp-t">
+      <h2 id="imp-t">Important Information</h2>
+      <ul class="notes">
+        <li>HERTS is designed as a monitoring system and its displayed information should not be interpreted as a standalone medical diagnosis.</li>
+        <li>Monitoring results may depend on proper placement of the vest and electrodes.</li>
+        <li>Make sure the device is properly connected before starting a monitoring session.</li>
+        <li>Poor electrode contact or movement during monitoring may affect the quality of the collected data.</li>
+        <li>If the device shows a connection or signal issue, check the device and electrode placement before continuing the session.</li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="foot">
+    <div class="foot-brand">
+      <div class="foot-logo"><img src="assets/herts-logo.png" alt="" width="132" height="78"><div><b>HERTS</b><span>CARDIAC MONITOR</span></div></div>
+      <p>High-speed Electrical Reconstruction Tomography System</p>
+      <p><strong>Continuous Cardiac Monitoring</strong></p>
+      <p>Monitor heart activity and rhythm in real time through heart visualization.</p>
+    </div>
+    <nav aria-label="Footer">
+      <h3>Navigasi</h3>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="information.html">Information</a></li>
+        <li><a href="#how-it-works">Guide</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+    </nav>
+    <div>
+      <h3>Kontak</h3>
+      <!-- PLACEHOLDER: replace with the real contact email -->
+      <p class="mail">XXXXXXX@gmail.com</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Mobile menu toggle (the only JavaScript on the page)
+  const btn=document.querySelector('.menu-btn'),nav=document.getElementById('nav');
+  btn.addEventListener('click',()=>{const o=nav.classList.toggle('open');btn.setAttribute('aria-expanded',o)});
+  nav.addEventListener('click',e=>{if(e.target.closest('a')){nav.classList.remove('open');btn.setAttribute('aria-expanded','false')}});
+</script>
+</body>
+</html>

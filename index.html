@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HERTS — Real-Time Thoracic Monitoring, Made Smarter</title>
+<meta name="description" content="HERTS is a wearable thoracic monitoring system that uses Electrical Impedance Tomography (EIT) to visualize changes in the chest in real time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- Design tokens (colors taken from the approved design) ---------- */
+:root{
+  --brand:#2F5EA7;        /* primary blue: actions, links, sub-headings */
+  --brand-dark:#234A86;   /* hover */
+  --ink:#17212F;          /* body text and headings: instrument navy */
+  --bg:#F7F8F8;           /* page background */
+  --card:#FFFFFF;         /* card surface */
+  --card-line:#DAE1E8;    /* card border */
+  --pill:#E3ECF5;         /* secondary button */
+  --line:#A9B8C6;         /* dividers */
+  --white:#fff;
+  --navy-2:#223A5C;
+  --header-bg:linear-gradient(100deg,#17212F 0%,#1E3A66 38%,#2F5EA7 74%,#3977B4 100%);   /* navy → blue */
+
+  --fs-body:clamp(1rem,.95rem + .25vw,1.125rem);     /* 16–18px */
+  --fs-small:.9375rem;                                /* 15px */
+  --fs-h1:clamp(2.25rem,1.4rem + 3.6vw,4rem);
+  --fs-h2:clamp(1.875rem,1.3rem + 2.4vw,3rem);
+  --fs-h3:clamp(1.25rem,1.1rem + .6vw,1.5rem);
+  --shadow:0 1px 2px rgba(23,33,47,.06), 0 10px 24px -12px rgba(23,33,47,.28);
+  --maxw:1200px;
+  --gutter:clamp(1.25rem,4vw,3rem);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:var(--fs-body);line-height:1.6}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+h1,h2,h3,p{margin:0}
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:var(--gutter)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px;border-radius:6px}
+.skip{position:absolute;left:-999px;top:0;background:#fff;color:var(--brand);padding:.5rem 1rem;z-index:20}
+.skip:focus{left:1rem;top:1rem}
+
+/* ---------- Header ---------- */
+.site-header{background:var(--header-bg);color:#fff;position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(255,255,255,.1);box-shadow:0 2px 14px rgba(23,33,47,.38)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:68px;padding-inline:var(--gutter);max-width:1440px;margin-inline:auto}
+.brand{display:flex;align-items:center;gap:.75rem;text-decoration:none;color:#fff}
+.brand img{height:44px;width:auto;filter:drop-shadow(0 0 8px rgba(107,187,206,.5))}
+.brand b{display:block;font-size:1.25rem;line-height:1.1;font-weight:700;letter-spacing:.02em}
+.brand span{display:block;font-size:var(--fs-small);font-weight:400;line-height:1.2}
+.nav{display:flex;align-items:center;gap:.5rem}
+.nav a{color:#fff;text-decoration:none;font-weight:600;font-size:1.0625rem;padding:.5rem 1.25rem;border-radius:999px;min-height:44px;display:inline-flex;align-items:center;transition:background .15s}
+.nav a:hover{background:rgba(255,255,255,.2)}
+.nav a[aria-current="page"]{background:#fff;color:var(--brand);font-weight:700}
+.nav a:focus-visible{outline-color:#fff}
+.menu-btn{display:none;background:transparent;border:2px solid #fff;color:#fff;border-radius:8px;width:48px;height:44px;cursor:pointer;padding:0}
+.menu-btn span,.menu-btn span::before,.menu-btn span::after{display:block;width:22px;height:2px;background:#fff;margin:auto;position:relative;content:""}
+.menu-btn span::before{position:absolute;top:-7px;left:0}.menu-btn span::after{position:absolute;top:7px;left:0}
+.menu-btn:focus-visible{outline-color:#fff}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.65rem 1.75rem;border-radius:8px;font:600 1.0625rem/1.2 inherit;font-family:inherit;text-decoration:none;box-shadow:0 1px 2px rgba(23,33,47,.22);transition:background .15s,transform .1s;cursor:pointer;border:0}
+.btn-primary{background:var(--brand);background-image:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0) 62%);color:#fff}
+.btn-primary:hover{background:var(--brand-dark);background-image:none}
+.btn-secondary{background:var(--pill);color:var(--ink)}
+.btn-secondary:hover{background:#D2DFEC}
+.btn:active{transform:translateY(1px)}
+.btns{display:flex;flex-wrap:wrap;gap:1rem}
+
+/* ---------- Sections ---------- */
+section{padding-block:clamp(2.5rem,6vw,4.5rem)}
+h1{font-size:var(--fs-h1);line-height:1.2;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+h2{font-size:var(--fs-h2);line-height:1.15;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+h3{font-size:var(--fs-h3);line-height:1.25;font-weight:600;color:var(--brand)}
+
+/* Hero */
+.hero{padding-top:clamp(2rem,5vw,3.5rem)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(2rem,5vw,4rem);align-items:start}
+.hero-copy{border-left:3px solid var(--brand);padding-left:clamp(1.25rem,3vw,2.5rem);display:grid;gap:1.5rem;max-width:34rem}
+.hero-copy p{max-width:32rem}
+.hero-visual{display:grid;gap:1rem;justify-items:center}
+.hero-visual figure{margin:0;width:100%}
+.hero-visual img{width:100%;border-radius:12px;box-shadow:var(--shadow)}
+.hero-visual figcaption{text-align:center;font-size:var(--fs-small);margin-top:.9rem}
+.hero-visual .btns{justify-content:center;margin-top:.75rem}
+
+/* Why HERTS */
+.why-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(2rem,5vw,4rem);align-items:center}
+.why-img img{width:100%;aspect-ratio:572/490;object-fit:cover;border-radius:14px;box-shadow:var(--shadow)}
+.why-copy{display:grid;gap:1.75rem}
+.cards-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem}
+.feature{background:var(--card);border:1px solid var(--card-line);border-radius:12px;padding:1.25rem 1.25rem 1.4rem;box-shadow:var(--shadow);display:grid;gap:.5rem;align-content:start}
+.feature p{font-size:1rem;line-height:1.5}
+
+/* What We Offer */
+.offer-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(2rem,5vw,4rem);align-items:center}
+.offer-copy{display:grid;gap:1.5rem}
+.offer-list{list-style:none;margin:0;padding:0;display:grid;gap:1.25rem}
+.offer-list li{display:grid;grid-template-columns:52px 1fr;gap:1rem;align-items:start}
+.offer-list img{width:44px;height:44px;object-fit:contain;margin-top:.2rem}
+.offer-list strong{font-weight:700}
+.vest{display:grid;place-items:center}
+.vest img{width:min(100%,440px);aspect-ratio:1;object-fit:contain}
+
+/* Who can use */
+.who{text-align:center}
+.who h2{margin-bottom:clamp(1.75rem,4vw,2.75rem)}
+.cards-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(1.25rem,3vw,2.5rem);max-width:900px;margin-inline:auto}
+.audience{background:var(--card);border:1px solid var(--card-line);border-radius:12px;box-shadow:var(--shadow);padding:1.25rem 1rem 1.5rem;display:grid;gap:1rem;justify-items:center;align-content:start}
+.audience img{width:56px;height:56px;object-fit:contain}
+
+/* CTA */
+.cta{padding-block:clamp(2rem,5vw,3.5rem)}
+.cta-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:1.5rem 2.5rem}
+.cta h2{font-size:clamp(1.625rem,1.2rem + 1.6vw,2.25rem);color:var(--ink)}
+
+/* Footer */
+.site-footer{border-top:1px solid var(--line);margin-top:clamp(1.5rem,4vw,3rem);padding-block:2.5rem 3rem;font-size:var(--fs-small)}
+.foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:2rem}
+.foot-brand{display:grid;gap:.75rem;align-content:start}
+.foot-logo{display:flex;align-items:center;gap:.75rem}
+.foot-logo img{height:52px;width:auto}
+.foot-logo b{display:block;font-size:1.125rem;line-height:1.1;font-weight:700;color:var(--ink)}
+.foot-logo span{font-weight:400;font-size:1rem}
+.foot-brand strong{font-weight:600}
+.foot h3,.foot-col h3{font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem}
+.foot-col ul{list-style:none;margin:0;padding:0;display:grid;gap:.25rem}
+.foot-col a{text-decoration:none;display:inline-block;padding:.2rem 0}
+.foot-col a:hover{color:var(--brand);text-decoration:underline}
+.foot-col p{font-weight:600;overflow-wrap:anywhere}
+
+/* ---------- Subtle homepage motion ---------- */
+/* Product and card motion: noticeable, polished, and restrained. */
+.vest{position:relative;min-height:clamp(300px,34vw,440px);isolation:isolate}
+.vest-rotator{position:relative;width:min(100%,440px);aspect-ratio:3/4;display:grid;place-items:center;overflow:visible;perspective:900px}
+.vest-rotator::after{content:"";position:absolute;z-index:-1;left:18%;right:18%;bottom:7%;height:7%;border-radius:50%;background:rgba(23,33,47,.15);filter:blur(18px);transform:scaleX(.82);transition:transform .7s ease,opacity .7s ease;opacity:.6}
+.vest-rotator img{grid-area:1/1;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 18px 20px rgba(23,33,47,.18));opacity:0;transform:translateY(18px) rotateY(-9deg) scale(.94);transition:opacity .65s ease,transform .85s cubic-bezier(.2,.75,.25,1);will-change:transform,opacity}
+.vest-rotator img.is-active{opacity:1;transform:translateY(0) rotateY(0) scale(1);animation:vest-float 3.2s ease-in-out .85s infinite}
+.vest-rotator:hover img.is-active{animation-play-state:paused;transform:translateY(-8px) rotateY(-4deg) scale(1.035)}
+.vest-rotator:hover::after{transform:scaleX(.65);opacity:.4}
+@keyframes vest-float{0%,100%{translate:0 0;rotate:0deg}50%{translate:0 -9px;rotate:1deg}}
+.feature,.audience{position:relative;overflow:hidden;transition:transform .32s cubic-bezier(.2,.75,.25,1),box-shadow .32s ease,border-color .32s ease;background-image:linear-gradient(115deg,transparent 0%,transparent 38%,rgba(255,255,255,.48) 50%,transparent 62%,transparent 100%);background-size:220% 100%;background-position:120% 0}
+.feature:hover,.audience:hover{transform:translateY(-7px) scale(1.018);box-shadow:0 16px 30px -14px rgba(23,33,47,.34);border-color:rgba(47,94,167,.42);background-position:-20% 0}
+/* Entrance + gentle idle motion after reveal; content stays visible without JS. */
+.motion-ready .feature,.motion-ready .audience{opacity:0;transform:translateY(16px) scale(.975)}
+.motion-ready .feature.is-visible,.motion-ready .audience.is-visible{opacity:1;transform:translateY(0) scale(1);transition:opacity .65s ease,transform .65s cubic-bezier(.2,.75,.25,1),box-shadow .32s ease,border-color .32s ease,background-position .7s ease}
+.motion-ready .feature.is-visible{animation:card-settle 5.5s ease-in-out 1.2s infinite}
+.motion-ready .audience.is-visible{animation:card-settle 5.5s ease-in-out 1.5s infinite}
+.feature:nth-child(2),.audience:nth-child(2){transition-delay:.08s;animation-delay:1.45s}
+.feature:nth-child(3),.audience:nth-child(3){transition-delay:.16s;animation-delay:1.7s}
+.feature:nth-child(4){transition-delay:.24s;animation-delay:1.95s}
+.feature:hover,.audience:hover{animation-play-state:paused!important}
+@keyframes card-settle{0%,86%,100%{translate:0 0}92%{translate:0 -3px}}
+@media (prefers-reduced-motion:reduce){
+  .vest-rotator img,.feature,.audience,.motion-ready .feature,.motion-ready .audience{transition:none!important;transform:none!important;animation:none!important;translate:none!important;rotate:none!important}
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width:960px){
+  .hero-grid,.why-grid,.offer-grid{grid-template-columns:1fr}
+  .hero-copy{max-width:none}
+  .why-img{order:2}
+  .vest{order:-1}
+  .offer-copy{order:1}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .foot-brand{grid-column:1/-1}
+}
+@media (max-width:760px){
+  .menu-btn{display:block}
+  .nav{display:none;position:absolute;left:0;right:0;top:100%;background:#17212F;flex-direction:column;align-items:stretch;padding:.5rem var(--gutter) 1rem;gap:.25rem;box-shadow:0 6px 8px rgba(0,0,0,.25)}
+  .nav.open{display:flex}
+  .nav a{justify-content:flex-start;border-radius:8px}
+}
+@media (max-width:640px){
+  .cards-2{grid-template-columns:1fr}
+  .cards-3{grid-template-columns:1fr;max-width:380px}
+  .audience{grid-template-columns:auto 1fr;justify-items:start;align-items:center;text-align:left;padding:1rem 1.25rem}
+  .audience img{order:-1}
+  .foot-grid{grid-template-columns:1fr}
+  .btns .btn,.hero-visual .btns .btn{flex:1 1 100%}
+  .brand span{display:none}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn,.nav a{transition:none}}
+</style>
+  <link rel="stylesheet" href="assets/mobile-responsive.css">
+</head>
+<body id="top">
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="index.html" aria-label="HERTS Thoracic Monitoring System — Home">
+      <img src="assets/herts-logo-white.png" alt="" width="132" height="78">
+      <div><b>HERTS</b><span>Thoracic Monitoring System</span></div>
+    </a>
+    <button class="menu-btn" aria-expanded="false" aria-controls="nav" aria-label="Toggle menu"><span></span></button>
+    <!-- Home/Information/Guide are connected. TODO: login.html is still a placeholder -->
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="index.html" aria-current="page">Home</a>
+      <a href="information.html">Information</a>
+      <a href="information.html#how-it-works">Guide</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <h1 id="hero-title">Real-Time Thoracic Monitoring, Made Smarter.</h1>
+      <p>HERTS is a wearable thoracic monitoring system that uses Electrical Impedance Tomography (EIT) to visualize changes in the chest in real time.</p>
+      <p>Designed to support continuous and accessible monitoring for patients and healthcare professionals.</p>
+    </div>
+    <div class="hero-visual">
+      <figure>
+        <img src="assets/dashboard-preview.png" width="645" height="339" alt="HERTS dashboard preview showing a live EIT chest visualization with a relative impedance scale and current session details">
+        <figcaption>User Interface of HERTS Dashboard</figcaption>
+      </figure>
+      <!-- Get Started -> login.html (placeholder); Learn How It Works -> Information & Guide page -->
+      <div class="btns">
+        <a class="btn btn-primary" href="login.html">Get Started</a>
+        <a class="btn btn-secondary" href="information.html#how-it-works">Learn How It Works</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY HERTS ============ -->
+<section aria-labelledby="why-title">
+  <div class="wrap why-grid">
+    <div class="why-img">
+      <img src="assets/thorax.jpg" width="572" height="490" alt="Illustration of a human chest showing the ribcage, spine and heart" loading="lazy">
+    </div>
+    <div class="why-copy">
+      <h2 id="why-title">Why HERTS?</h2>
+      <div class="cards-2">
+        <article class="feature"><h3>Real-Time</h3><p>See your monitoring results as they happen</p></article>
+        <article class="feature"><h3>Comfortable</h3><p>Designed to be worn comfortably during monitoring</p></article>
+        <article class="feature"><h3>Wearable</h3><p>No need to stay connected to a large machine</p></article>
+        <article class="feature"><h3>Easy to Use</h3><p>Simple interface for everyday monitoring</p></article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHAT WE OFFER ============ -->
+<section aria-labelledby="offer-title">
+  <div class="wrap offer-grid">
+    <div class="offer-copy">
+      <h2 id="offer-title">What We Offer</h2>
+      <p>HERTS brings wearable technology to thoracic monitoring, providing real-time information in a practical and easy-to-understand way.</p>
+      <ul class="offer-list">
+        <li><img src="assets/offer-realtime.png" alt="" loading="lazy"><span><strong>Real-time</strong> thoracic monitoring using Electrical Impedance Tomography (EIT).</span></li>
+        <li><img src="assets/offer-insights.png" alt="" loading="lazy"><span><strong>Visual insights</strong> into the chest and heart activity through integrated EIT and ECG monitoring.</span></li>
+        <li><img src="assets/offer-wearable.png" alt="" loading="lazy"><span><strong>Wearable and practical design</strong> for a more convenient monitoring experience.</span></li>
+        <li><img src="assets/offer-history.png" alt="" loading="lazy"><span><strong>Monitoring history</strong> at your fingertips, allowing users to review previous sessions through the HERTS platform.</span></li>
+      </ul>
+    </div>
+    <div class="vest">
+      <div class="vest-rotator" aria-label="HERTS wearable vest shown from multiple angles">
+        <img class="is-active" src="assets/vest-angle-1.webp" width="1080" height="1600" alt="HERTS wearable vest, front view" fetchpriority="low">
+        <img src="assets/vest-angle-2.webp" width="1080" height="1600" alt="HERTS wearable vest, angled view" loading="lazy">
+        <img src="assets/vest-angle-3.webp" width="1080" height="1600" alt="HERTS wearable vest, opposite angled view" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHO CAN USE THIS ============ -->
+<section class="who" aria-labelledby="who-title">
+  <div class="wrap">
+    <h2 id="who-title">Who Can Use This</h2>
+    <div class="cards-3">
+      <article class="audience"><h3>Patient</h3><img src="assets/icon-patient.png" width="65" height="65" alt="" loading="lazy"></article>
+      <article class="audience"><h3>Hospitals &amp; Clinics</h3><img src="assets/icon-hospital.png" width="67" height="67" alt="" loading="lazy"></article>
+      <article class="audience"><h3>Doctors</h3><img src="assets/icon-doctor.png" width="59" height="59" alt="" loading="lazy"></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="cta" aria-labelledby="cta-title">
+  <div class="wrap cta-inner">
+    <h2 id="cta-title">Wanna Know more?</h2>
+    <div class="btns">
+      <a class="btn btn-primary" href="login.html">Get Started</a>
+      <a class="btn btn-secondary" href="information.html#how-it-works">Learn How It Works</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <div class="foot-logo"><img src="assets/herts-logo.png" alt="" width="132" height="78"><div><b>HERTS</b><span>CARDIAC MONITOR</span></div></div>
+      <p>High-speed Electrical Reconstruction Tomography System</p>
+      <p><strong>Continuous Cardiac Monitoring</strong></p>
+      <p>Monitor heart activity and rhythm in real time through heart visualization.</p>
+    </div>
+    <nav class="foot-col" aria-label="Footer">
+      <h3>Navigasi</h3>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="information.html">Information</a></li>
+        <li><a href="information.html#how-it-works">Guide</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+    </nav>
+    <div class="foot-col">
+      <h3>Kontak</h3>
+      <!-- TODO: replace with the real contact email -->
+      <p>XXXXXXX@gmail.com</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Mobile menu toggle (only JavaScript on the page)
+  const btn=document.querySelector('.menu-btn'),nav=document.getElementById('nav');
+  btn.addEventListener('click',()=>{const o=nav.classList.toggle('open');btn.setAttribute('aria-expanded',o)});
+  nav.addEventListener('click',e=>{if(e.target.closest('a')){nav.classList.remove('open');btn.setAttribute('aria-expanded','false')}});
+
+  // Rotate through the three supplied vest photos with a restrained cross-fade.
+  const vestRotator=document.querySelector('.vest-rotator');
+  if(vestRotator){
+    const vestFrames=[...vestRotator.querySelectorAll('img')];
+    let vestIndex=0,vestTimer;
+    const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const showNextVest=()=>{
+      vestFrames[vestIndex].classList.remove('is-active');
+      vestIndex=(vestIndex+1)%vestFrames.length;
+      vestFrames[vestIndex].classList.add('is-active');
+    };
+    if(!reducedMotion && vestFrames.length>1){
+      vestTimer=window.setInterval(showNextVest,2200);
+      vestRotator.addEventListener('mouseenter',()=>window.clearInterval(vestTimer));
+      vestRotator.addEventListener('mouseleave',()=>{window.clearInterval(vestTimer);vestTimer=window.setInterval(showNextVest,2200)});
+      document.addEventListener('visibilitychange',()=>{
+        window.clearInterval(vestTimer);
+        if(!document.hidden) vestTimer=window.setInterval(showNextVest,2200);
+      });
+    }
+  }
+
+  // Reveal feature and audience cards gently as they enter the viewport.
+  const motionCards=[...document.querySelectorAll('.feature,.audience')];
+  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window){
+    document.documentElement.classList.add('motion-ready');
+    const cardObserver=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){entry.target.classList.add('is-visible');cardObserver.unobserve(entry.target)}
+      });
+    },{threshold:0.14});
+    motionCards.forEach(card=>cardObserver.observe(card));
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patients — HERTS Doctor Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/patient-portal.css">
+<link rel="stylesheet" href="assets/doctor-portal.css">
+  <link rel="stylesheet" href="assets/mobile-responsive.css">
+</head>
+<body>
+<main class="page dr"><div class="dp">
+  <h1>Patients</h1>
+  <p class="lede">View and manage patients assigned to your account.</p>
+  <section class="dcard pad" style="margin-top:22px" aria-label="Patient list">
+    <div class="tool">
+      <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#17212F" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Search patient name or ID…" aria-label="Search patient name or ID" autocomplete="off"></label>
+      <div class="chips" role="group" aria-label="Filter patients">
+        <button class="chip" type="button" data-f="all" aria-pressed="true">All Patients</button>
+        <button class="chip" type="button" data-f="with" aria-pressed="false">With Sessions</button>
+        <button class="chip" type="button" data-f="none" aria-pressed="false">No Recent Session</button>
+      </div>
+    </div>
+    <div class="tw"><table class="dt big"><thead><tr><th>Patient ID</th><th>Patient Name</th><th>Latest Session</th><th>Last Session Date</th><th>Session Status</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <p class="nores" id="none" hidden>No patients match your search.</p>
+    <div class="tfoot"><span id="count" role="status" aria-live="polite"></span><span>Only patients linked to your account are listed.</span></div>
+  </section>
+</div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/doctor.js"></script>
+<script src="assets/doctor-data.js"></script>
+<script>
+HD.shell("patients");
+(async function(){
+  var D=window.HERTSDoctorData, $=HD.$, E=D.esc, filter="all", all=[];
+  function render(){
+    var q=$("#q").value.trim().toLowerCase();
+    var latest={}; all.sessions.forEach(function(s){if(!latest[s.patient_id])latest[s.patient_id]=s;});
+    var rows=all.patients.filter(function(p){
+      var l=latest[p.id], hay=(p.patient_code+" "+p.full_name).toLowerCase();
+      return (!q||hay.includes(q))&&(filter==="all"||(filter==="with"?!!l:!l));
+    });
+    $("#rows").innerHTML=rows.map(function(p){var l=latest[p.id];return '<tr><td class="id">'+E(p.patient_code)+'</td><td><b>'+E(p.full_name)+'</b></td><td><b>'+(l?E(l.session_code):"—")+'</b></td><td>'+(l?E(D.date(l.started_at)):"—")+'</td><td>'+(l?D.badge(l.status):D.badge(null))+'</td><td><a class="lnk" href="doctor-patient-detail.html?patient='+encodeURIComponent(p.id)+'">View Details ▶</a></td></tr>';}).join("");
+    $("#none").hidden=rows.length>0; $("#count").textContent="Showing "+rows.length+" of "+all.patients.length+" assigned patients";
+  }
+  try {
+    var ctx=await D.doctor(); all.patients=await D.patients(ctx.client,ctx.user.id); all.sessions=await D.sessionsFor(ctx.client,all.patients.map(function(p){return p.id;}));
+    $("#q").addEventListener("input",render);
+    document.querySelectorAll(".chip").forEach(function(b){b.addEventListener("click",function(){filter=b.dataset.f;document.querySelectorAll(".chip").forEach(function(c){c.setAttribute("aria-pressed",c===b);});render();});});
+    render();
+  } catch(e){console.error(e);$("#rows").innerHTML='<tr><td colspan="6">'+E(e.message||"Could not load patients.")+'</td></tr>';$("#count").textContent="Patient data could not be loaded.";}
+})();
+</script>
+</body>
+</html>

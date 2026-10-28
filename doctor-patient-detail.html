@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patient Detail — HERTS Doctor Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/patient-portal.css">
+<link rel="stylesheet" href="assets/doctor-portal.css">
+  <link rel="stylesheet" href="assets/mobile-responsive.css">
+</head>
+<body>
+<main class="page dr"><div class="dp" id="root">
+  <p class="crumbs"><a href="doctor-patients.html">Patients</a> <span>/</span> Patient Detail</p>
+  <div class="titlebar"><div><h1 id="name"></h1><p class="lede">Patient ID: <b id="pid"></b></p></div><a class="btn ghost" href="doctor-patients.html">← Back to Patients</a></div>
+  <section class="dcard" style="margin-top:22px" aria-labelledby="pi-t">
+    <div class="head"><div><h2 id="pi-t">Patient Information</h2><p class="sub">Linked to your account.</p></div><span class="tag dark">Prototype Data</span></div>
+    <dl class="infof" id="info"></dl>
+  </section>
+  <section class="dcard" style="margin-top:22px" aria-labelledby="ms-t">
+    <h2 id="ms-t">Measurement Sessions</h2><p class="sub">Sessions belonging to this patient. Select View Session to review measurement data.</p>
+    <div class="tw"><table class="dt big"><thead><tr><th>Session ID</th><th>Date &amp; Time</th><th>Duration</th><th>Recording Status</th><th>Session Status</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <p class="nores" id="none" hidden>No measurement sessions recorded for this patient yet.</p>
+    <div class="tfoot"><span id="count"></span><span>View Session opens Session Detail.</span></div>
+  </section>
+</div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/doctor.js"></script>
+<script src="assets/doctor-data.js"></script>
+<script>
+HD.shell("patients");
+(async function(){
+ var D=window.HERTSDoctorData,$=HD.$,E=D.esc;
+ try{
+  var ctx=await D.doctor(), id=D.param("patient");
+  if(!id) throw new Error("Patient ID tidak ditemukan pada URL.");
+  var ps=await D.patients(ctx.client,ctx.user.id), p=ps.find(function(x){return x.id===id;});
+  if(!p) throw new Error("Pasien tidak ditemukan atau tidak ditautkan ke akun dokter ini.");
+  var ss=await D.sessionsFor(ctx.client,[p.id]), latest=ss[0];
+  document.title=p.full_name+" — HERTS Doctor Portal";
+  $("#name").textContent=p.full_name; $("#pid").textContent=p.patient_code;
+  $("#info").innerHTML=[["Patient Name",E(p.full_name)],["Patient ID",E(p.patient_code)],["Date of Birth",p.date_of_birth?E(p.date_of_birth):"—"],["Sex",p.sex?E(p.sex):"—"],["Latest Session ID",latest?E(latest.session_code):"—"],["Latest Session Date & Time",latest?E(D.date(latest.started_at)):"—"],["Latest Session Status",latest?D.badge(latest.status):D.badge(null)]].map(function(r){return '<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>';}).join("");
+  $("#rows").innerHTML=ss.map(function(s){return '<tr><td class="id">'+E(s.session_code)+'</td><td>'+E(D.date(s.started_at))+'</td><td>'+E(s.duration_minutes!=null?s.duration_minutes+" min":D.duration(s))+'</td><td>'+(s.recording_available?"Available":(s.status==="in_progress"?"In progress":"Not available"))+'</td><td>'+D.badge(s.status)+'</td><td><a class="lnk" href="doctor-session-detail.html?session='+encodeURIComponent(s.id)+'">View Session ▶</a></td></tr>';}).join("");
+  $("#none").hidden=ss.length>0;$("#count").textContent="Showing "+ss.length+" session"+(ss.length===1?"":"s");
+ }catch(e){console.error(e);$("#root").innerHTML='<p class="crumbs"><a href="doctor-patients.html">Patients</a> <span>/</span> Patient Detail</p><section class="dcard msg" style="margin-top:22px"><h2>Patient data unavailable</h2><p>'+E(e.message||"Unable to load patient.")+'</p><a class="btn" href="doctor-patients.html">Back to Patients</a></section>';}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Profile — HERTS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/patient-portal.css">
+  <link rel="stylesheet" href="assets/mobile-responsive.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="patient-monitoring.html" aria-label="HERTS — Monitoring"><img src="assets/herts-logo-white.png" alt="" width="132" height="78">HERTS</a>
+    <nav class="nav" aria-label="Main">
+      <a href="patient-monitoring.html">Monitoring</a>
+      <a href="patient-history.html">History</a>
+    </nav>
+    <a class="user is-active" href="patient-profile.html" aria-current="page" aria-label="My profile"><span>Budi Artanto</span><b class="ini" aria-hidden="true">BA</b></a>
+  </div>
+</header>
+
+<main class="page pf">
+  <div class="pf-wrap">
+    <div class="pf-intro">
+      <h1>My Profile</h1>
+      <p>View your personal information and account details.</p>
+    </div>
+
+    <div class="pf-grid">
+      <div class="pf-col">
+
+        <section class="pcard pf-id" aria-label="Profile summary">
+          <div class="avatar" aria-hidden="true">BA</div>
+          <div>
+            <h2>Budi Artanto</h2>
+            <p>Patient ID: P001</p>
+            <span class="tag">Patient</span>
+          </div>
+        </section>
+
+        <section class="pcard" aria-labelledby="pi-t">
+          <div class="head">
+            <div>
+              <h2 id="pi-t">Personal Information</h2>
+              <p class="sub">Your details as registered in HERTS.</p>
+            </div>
+            <span class="tag">Prototype Data</span>
+          </div>
+          <dl class="fields">
+            <div><dt>Full Name</dt><dd>Budi Artanto</dd></div>
+            <div><dt>Patient ID</dt><dd>P001</dd></div>
+            <div><dt>Email Address</dt><dd>budi.artanto@example.com</dd></div>
+            <div><dt>Date of Birth</dt><dd>14 May 1985</dd></div>
+          </dl>
+        </section>
+
+      </div>
+
+      <div class="pf-col">
+
+        <section class="pcard" aria-labelledby="ai-t">
+          <h2 id="ai-t">Account Information</h2>
+          <p class="sub">Your HERTS account.</p>
+          <dl class="rows">
+            <div><dt>Account Email<small>Used to sign in</small></dt><dd>budi.artanto@example.com</dd></div>
+            <div><dt>Account Status</dt><dd><span class="tag ok">Active</span></dd></div>
+          </dl>
+        </section>
+
+        <section class="pcard" aria-labelledby="aa-t">
+          <h2 id="aa-t">Account Actions</h2>
+          <p class="sub">Update your details or sign out.</p>
+          <div class="actions">
+            <!-- PLACEHOLDER: no edit-profile flow has been designed yet -->
+            <button type="button" class="btn" id="edit">Edit Profile</button>
+            <a class="btn outline" href="login.html">Log Out</a>
+          </div>
+          <p class="note" id="edit-note" role="status" hidden>Profile editing is not available in this prototype.</p>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="foot slim">
+    <div>
+      <img class="flogo" src="assets/herts-logo.png" alt="" width="132" height="78">
+      <p class="t">HERTS — Cardiac Monitor</p>
+      <p>High-speed Electrical Reconstruction Tomography System</p>
+      <p>Continuous Cardiac Monitoring</p>
+    </div>
+    <nav aria-label="Footer"><h3>Navigasi</h3><ul><li><a href="index.html">Home</a></li><li><a href="information.html">Information</a></li><li><a href="information.html#how-it-works">Guide</a></li></ul></nav>
+    <div><h3>Kontak</h3><p class="mail">XXXXXXX@gmail.com</p></div>
+  </div>
+</footer>
+
+<script>
+document.getElementById("edit").addEventListener("click", function(){
+  document.getElementById("edit-note").hidden = false;
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/patient-data.js"></script>
+</body>
+</html>
