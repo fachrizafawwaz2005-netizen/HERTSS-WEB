@@ -1,0 +1,70 @@
+/* HERTS — shared EIT measurement panel (patient monitoring, patient session detail, doctor session detail).
+   Layout: EIT image left (~60%), single U graph right (~38%), scale/info row below.
+   Colours come from the tokens in patient-portal.css; .eitp--dark re-themes the charts for the doctor portal's dark data panels. */
+.eitp{--eitp-ink:var(--ink);--eitp-ink-2:var(--ink-2);--eitp-grid:#DAE1E8;--eitp-axis:#6F8399;--eitp-zero:#17212F;
+  --eitp-base:#C25A00;--eitp-live:#2F5EA7;--eitp-pos:#2F5EA7;--eitp-neg:#B42318;--eitp-surface:#fff;--eitp-line:var(--line);
+  margin-top:20px;display:grid;gap:18px}
+.eitp--dark{--eitp-ink:#E6EEF6;--eitp-ink-2:#C9D6E2;--eitp-grid:#2A4468;--eitp-axis:#8DA2B8;--eitp-zero:#E6EEF6;
+  --eitp-base:#F59E42;--eitp-live:#6BBBCE;--eitp-pos:#6BBBCE;--eitp-neg:#FF8A7A;--eitp-surface:#17212F;--eitp-line:#2A4468}
+
+.eitp-main{display:grid;grid-template-columns:minmax(0,62fr) minmax(0,38fr);gap:18px;align-items:stretch}
+.eitp-img{position:relative;min-height:380px;background:#fff;border:1px solid var(--line);border-radius:var(--r-box);padding:8px}
+.eitp-img img,.eitp-img canvas{position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);object-fit:contain;max-width:none}
+.eitp-img.dark{background:radial-gradient(120% 95% at 50% 42%,#223A5C 0%,#17212F 55%,#101823 100%);border-color:#2A4468}
+.eitp-img .tag{position:absolute;left:10px;top:10px;z-index:1}
+.eitp-img.dark canvas{inset:40px 10px 10px;height:calc(100% - 50px)}
+
+.eitp-charts{display:grid;gap:14px;align-content:start;min-width:0}
+.eitp-chart{margin:0;height:100%;background:var(--eitp-surface);border:1px solid var(--eitp-line);border-radius:var(--r-box);padding:12px 12px 8px;min-width:0}
+.eitp-chart figcaption{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.eitp-chart h3{font-size:15px;font-weight:600;line-height:1.3;color:var(--eitp-ink)}
+.eitp-chart .cs{font-size:13px;line-height:1.35;color:var(--eitp-ink-2);margin-top:1px}
+.eitp-chart .ph{font-size:11.5px;font-weight:600;line-height:1.2;padding:3px 9px;border-radius:var(--r-pill);border:1px solid var(--eitp-line);background:var(--pill);color:var(--ink-2);white-space:nowrap}
+.eitp--dark .eitp-chart .ph{background:rgba(107,187,206,.14);border-color:rgba(107,187,206,.45);color:#C4E7F0}
+.eitp-leg{display:flex;gap:16px;flex-wrap:wrap;margin-top:6px;font-size:13px;color:var(--eitp-ink)}
+.eitp-leg span{display:inline-flex;align-items:center;gap:6px}
+.eitp-leg i{display:inline-block;width:18px;height:0;border-top:3px solid currentColor;position:relative}
+.eitp-leg i::after{content:"";position:absolute;left:5px;top:-6px;width:8px;height:8px;border-radius:50%;background:currentColor}
+.eitp-leg .b{color:var(--eitp-base)}.eitp-leg .l{color:var(--eitp-live)}
+.eitp-plot{width:100%;min-width:0}
+.eitp-plot svg{display:block;width:100%;height:auto;overflow:visible}
+.eitp-plot text{font-family:inherit;fill:var(--eitp-ink-2);font-size:12px}
+.eitp-plot .yt,.eitp-plot .xt{fill:var(--eitp-ink);font-size:12.5px;font-weight:500}
+.eitp-plot .gl{stroke:var(--eitp-grid);stroke-width:1}
+.eitp-plot .sep{stroke:var(--eitp-grid);stroke-width:1;stroke-dasharray:2 3}
+.eitp-plot .axl{stroke:var(--eitp-axis);stroke-width:1}
+.eitp-plot .zero{stroke:var(--eitp-zero);stroke-width:1.5}
+.eitp-plot .pr{font-size:11px}
+
+.eitp-foot{display:grid;grid-template-columns:minmax(0,62fr) minmax(0,38fr);gap:18px;align-items:start}
+.eitp-foot .scale-col{min-width:0}
+.eitp-foot .bar-grad{margin-top:4px}
+.eitp-foot .ticks{margin-top:8px}
+.eitp-foot .legend-row{display:flex;gap:6px 22px;flex-wrap:wrap;margin-top:10px;font-size:13.5px;color:var(--ink)}
+.eitp-foot .legend-row .t{font-weight:600}
+.eitp-foot .explain{margin-top:14px;padding:14px 18px 10px}
+.eitp-foot .info-col{display:grid;gap:12px;min-width:0}
+.eitp-foot .box.session{min-height:0}
+.eitp-foot .box .pills{display:flex;flex-wrap:wrap;gap:8px}
+.eitp-foot .box .pills .pill+.pill{margin-top:0}
+.eitp-foot .box.session .meta{margin-top:12px}
+.eitp-note{font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+
+@media (max-width:980px){
+  .eitp-main,.eitp-foot{grid-template-columns:minmax(0,1fr)}
+  .eitp-img{min-height:0;aspect-ratio:1/1;max-height:520px}
+}
+@media (max-width:700px){
+  .eitp-img{aspect-ratio:1/1}
+  .eitp-chart h3{font-size:15px}
+}
+.eitp-img.dark .tag{background:rgba(107,187,206,.14);border-color:rgba(107,187,206,.45);color:#C4E7F0}
+.eitp-foot .sc-t{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:12px}
+.eitp-foot .gbox{background:var(--inset);border:1px solid var(--line);color:var(--ink);font-size:13.5px;border-radius:var(--r-box);padding:12px 16px;margin-top:14px;line-height:1.5}
+.eitp-foot .el{display:flex;gap:8px;align-items:center;font-size:13.5px;font-weight:600;color:var(--ink)}
+.eitp-foot .el i{width:10px;height:10px;border-radius:50%;background:#f00;flex:none}
+.eitp-foot .mini{font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+
+/* Doctor session detail: keep EIT panels on the original light HERTS theme. */
+.eitp:not(.eitp--dark) .eitp-img{background:#fff;border-color:var(--line)}
+.eitp:not(.eitp--dark) .eitp-img .tag{background:var(--pill);border-color:var(--line);color:var(--ink-2)}
