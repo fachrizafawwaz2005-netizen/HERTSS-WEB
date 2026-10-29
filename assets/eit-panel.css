@@ -68,3 +68,6 @@
 /* Doctor session detail: keep EIT panels on the original light HERTS theme. */
 .eitp:not(.eitp--dark) .eitp-img{background:#fff;border-color:var(--line)}
 .eitp:not(.eitp--dark) .eitp-img .tag{background:var(--pill);border-color:var(--line);color:var(--ink-2)}
+
+/* Boundary-based static JAC-style reconstruction preview */
+.eitp-img canvas[data-jac-preview], .eitp-img canvas#eit { display:block; position:absolute; inset:8px; width:calc(100% - 16px); height:calc(100% - 16px); object-fit:contain; max-width:none; }
