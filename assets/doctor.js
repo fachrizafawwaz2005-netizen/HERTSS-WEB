@@ -53,7 +53,6 @@ var HD = (function(){
       '<footer class="site-footer dr"><div class="foot">'+
       '<div><img class="flogo" src="assets/herts-logo.png" alt="" width="132" height="78"><p class="t">HERTS — Cardiac Monitor</p><p>High-speed Electrical Reconstruction Tomography System</p><p>Continuous Cardiac Monitoring</p></div>'+
       '<nav aria-label="Footer"><h3>Navigasi</h3><ul><li><a href="doctor-overview.html">Overview</a></li><li><a href="doctor-patients.html">Patients</a></li></ul></nav>'+
-      '<div><h3>Kontak</h3><p class="mail">XXXXXXX@gmail.com</p></div></div></footer>');
   }
   return {$:$,date:date,time:time,dur:dur,patient:patient,sessionsOf:sessionsOf,latest:latest,session:session,badge:badge,when:when,esc:esc,param:param,shell:shell};
 })();
