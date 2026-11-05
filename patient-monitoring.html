@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monitoring — HERTS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/patient-portal.css">
+<link rel="stylesheet" href="assets/eit-panel.css">
+  <link rel="stylesheet" href="assets/mobile-responsive.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="patient-monitoring.html" aria-label="HERTS — Monitoring"><img src="assets/herts-logo-white.png" alt="" width="132" height="78">HERTS</a>
+    <nav class="nav" aria-label="Main">
+      <a href="patient-monitoring.html" aria-current="page">Monitoring</a>
+      <a href="patient-history.html">History</a>
+    </nav>
+    <a class="user" href="patient-profile.html" aria-label="My profile"><span>Budi Artanto</span><img src="assets/avatar.png" alt="" width="45" height="45"></a>
+  </div>
+</header>
+
+<main class="page">
+  <div class="intro">
+    <p>Monitoring&nbsp; Session</p>
+    <p>Your session is currently active.</p>
+  </div>
+
+  <div class="cards">
+
+    <!-- ===== Live Hearts Visualization ===== -->
+    <section class="card" aria-labelledby="live-t">
+      <div class="head">
+        <div>
+          <h2 id="live-t">Live Hearts Visualization</h2>
+          <p class="sub">Displays the distribution of electrical impedance in the chest, measured through electrodes.</p>
+        </div>
+        <span class="pill">Budi</span>
+      </div>
+
+      <div class="eitp">
+        <div class="eitp-main">
+          <div class="eitp-img"><canvas data-jac-preview width="900" height="700" role="img" aria-label="Static JAC-style EIT reconstruction preview with eight boundary electrodes"></canvas></div>
+        <div class="eitp-charts">
+          <figure class="eitp-chart">
+            <figcaption>
+              <div><h3>U Measurement</h3><p class="cs">Baseline vs Live</p></div>
+              <span class="ph">Illustrative data</span>
+            </figcaption>
+            <div class="eitp-leg" aria-hidden="true"><span class="b"><i></i>Baseline</span><span class="l"><i></i>Live Measurement</span></div>
+            <div class="eitp-plot" data-eit-chart="u"></div>
+          </figure>
+        </div>
+        </div>
+
+        <div class="eitp-foot">
+          <div class="info-col">
+            <div class="box session">
+              <div class="pills"><span class="pill">Monitoring Active</span><span class="pill">Duration Monitoring: 02:14</span></div>
+              <dl class="meta">
+                <div><dt>Patient ID :</dt><dd>P001</dd></div>
+                <div><dt>Session ID :</dt><dd>SES-001</dd></div>
+                <div><dt>Started at</dt><dd>10:02 AM</dd></div>
+              </dl>
+            </div>
+            <p class="eitp-note">The EIT visualization remains an illustrative preview and is not reconstructed from this session’s measurements.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Session Log ===== -->
+    <section class="card log" aria-labelledby="log-t">
+      <h2 id="log-t">Session Log</h2>
+      <h3>Monitoring Timeline</h3>
+      <ul>
+        <li><b>10:02 AM</b><span>Monitoring started</span></li>
+        <li><b>10:38 AM</b><span>Heart activity stable</span></li>
+        <li class="hi"><b>11:15 AM</b><span>Higher heart activity recorded</span></li>
+        <li><b>11:22 AM</b><span>Activity returned to normal</span></li>
+      </ul>
+    </section>
+
+    <!-- ===== ECG monitoring ===== -->
+    <section class="card p-ecg" aria-labelledby="ecg-t">
+      <div class="p-ecg-head">
+        <div><p class="small">Electrocardiogram (ECG)</p><h2 id="ecg-t">Heart Rhythm</h2><p class="sub">Recorded ECG waveform from the current monitoring session.</p></div>
+        <span class="tag" id="ecg-status">Loading ECG…</span>
+      </div>
+      <div class="p-ecg-rate">
+        <div><h3>Heart rate</h3><p class="sub">Estimated from the recorded ECG signal</p></div>
+        <div class="p-ecg-bpm"><strong id="ecg-bpm">—</strong><span>bpm</span></div>
+      </div>
+      <p id="ecg-bpm-note" class="mini p-ecg-note">Waiting for ECG samples…</p>
+      <div class="p-ecg-plot">
+        <div id="ecg" role="img" aria-label="ECG waveform from recorded samples"></div>
+        <div class="p-ecg-axis"><span>ECG signal</span><span>Time →</span></div>
+        <p id="ecg-meta" class="mini p-ecg-meta">Loading ECG monitoring information…</p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="foot">
+    <div>
+      <div class="foot-logo"><img src="assets/herts-logo.png" alt="" width="132" height="78"><div><b>HERTS</b><span>CARDIAC MONITOR</span></div></div>
+      <p>High-speed Electrical Reconstruction Tomography System</p>
+      <p class="t">Continuous Cardiac Monitoring</p>
+      <p>Monitor heart activity and rhythm in real time through heart visualization.</p>
+    </div>
+    <nav aria-label="Footer"><h3>Navigasi</h3><ul><li><a href="index.html">Home</a></li><li><a href="information.html">Information</a></li><li><a href="information.html#how-it-works">Guide</a></li><li><a href="login.html">Login</a></li></ul></nav>
+  </div>
+</footer>
+<script src="assets/eit-panel.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/patient-data.js"></script>
+<script src="assets/patient-ecg.js"></script>
+<script src="assets/eit-reconstruction.js"></script>
+</body>
+</html>
